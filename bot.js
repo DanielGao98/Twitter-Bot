@@ -7,7 +7,7 @@ var Twitter = new twit(config);
 // find latest tweet according the query 'q' in params
 var retweet = function() {
     var params = {
-        q: '#nodejs, #Nodejs',  // REQUIRED
+        q: '#nba, #nfl',  // REQUIRED
         result_type: 'recent',
         lang: 'en'
     }
@@ -37,16 +37,16 @@ var retweet = function() {
 }
 
 // grab & retweet as soon as program is running...
-retweet();
+//retweet();
 // retweet in every 50 minutes
-setInterval(retweet, 30000);
+//setInterval(retweet, 30000);
 
 // FAVORITE BOT====================
 
 // find a random tweet and 'favorite' it
 var favoriteTweet = function(){
   var params = {
-      q: '#nodejs, #Nodejs',  // REQUIRED
+      q: '#kobe, #curry',  // REQUIRED
       result_type: 'recent',
       lang: 'en'
   }
@@ -73,12 +73,59 @@ var favoriteTweet = function(){
   });
 }
 // grab & 'favorite' as soon as program is running...
-favoriteTweet();
+//favoriteTweet();
 // 'favorite' a tweet in every 60 minutes
-setInterval(favoriteTweet, 36000);
+//setInterval(favoriteTweet, 36000);
 
 // function to generate a random tweet tweet
 function ranDom (arr) {
   var index = Math.floor(Math.random()*arr.length);
   return arr[index];
 };
+
+//Get random coordinates and 
+var randomLocation = function() {
+  var long1 = randomInRange(-180,180);
+  console.log(long1);
+  var long2 = randomInRange(-180,180);
+  console.log(long2);
+  var lat1 = randomInRange(-90,90);
+  console.log(lat1);
+  var lat2 = randomInRange(-90,90);
+  console.log(lat2);
+  
+  
+  var locations = [ long1, lat1, long2, lat2 ]
+ 
+  var stream = Twitter.stream('statuses/filter', { locations: locations })
+  console.log('stream success');
+  
+  stream.on('tweet', function (tweet) {
+    console.log('reached');
+    var loc = tweet.user.location;
+    console.log('reached2');
+    Twitter.post('statuses/update', { status: 'Tweet from ' + loc }, function(err, data, response) {
+      console.log(loc)
+    })
+    // Tell TWITTER to retweet
+            Twitter.post('statuses/retweet/:id', {
+                id: tweet.id
+            }, function(err, response) {
+                if (response) {
+                    console.log('Retweeted!!!');
+                }
+                // if there was an error while tweeting
+                if (err) {
+                    console.log('Something went wrong while RETWEETING... Duplication maybe...');
+                }
+            })
+  })
+}
+
+function randomInRange(min, max) {
+  return Math.random() < 0.5 ? ((1-Math.random()) * (max-min) + min) : (Math.random() * (max-min) + min);
+}
+
+randomLocation();
+setInterval(randomLocation, 30000);
+
